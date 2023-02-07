@@ -8,8 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
 
-    @Query("{\"email\":\"?0\",\"password\":\"?1\"}")
-    User validateUserLogin(String email, String password);
-
     User findByEmail(String email);
 }

@@ -8,6 +8,6 @@ public enum Category implements Serializable {
     FURNITURE,
     HARDWARE,
     KIDS,
-    SHOES
-
+    SHOES,
+    APPLIANCES
 }

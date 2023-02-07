@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Getter
@@ -13,9 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "preference")
-public class Preference {
+public class CataloguePreference implements Serializable {
+    @Id
+    private String id;
 
     private String email;
 
-    private List<Integer> preferenceList;
+    private List<String> preferredCategory;
 }

@@ -10,8 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PreferenceDTO {
-
     private String email;
-
-    private int preferredItemId;
+    private String preferredCatalogue;
 }

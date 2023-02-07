@@ -1,5 +1,6 @@
-package com.onlineShopping.model;
+package com.onlineShopping.dto;
 
+import com.onlineShopping.model.Item;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,9 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Cart implements Serializable {
+public class CartDTO implements Serializable {
     private String email;
-
     private List<Item> itemsInCart;
-
 }
