@@ -6,14 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CartDTO implements Serializable {
+public class CartDTO {
     private String email;
-    private List<Item> itemsInCart;
+    private Item itemInCart;
 }

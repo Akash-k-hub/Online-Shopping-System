@@ -1,0 +1,20 @@
+@startuml
+title <U> User Login
+
+actor User
+control "UserController" as Controller
+control "UserService" as Service
+entity UserRepository as Dao
+database MongoDB as DB
+
+User -> Controller : /login
+Controller -> Service : userLogin(user)
+Service -> Dao : validateUserLogin(email, password)
+Dao -> DB : findByEmail(email), \npasswordEncoder.matches(password)
+DB --> Dao
+DB --> DB
+Dao --> Service
+Service --> Controller
+Controller --> User : (200 OK) "Login Successful!"
+
+@enduml

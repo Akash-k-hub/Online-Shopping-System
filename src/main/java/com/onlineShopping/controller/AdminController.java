@@ -24,7 +24,7 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
-    @PostMapping("/registerAdmin")
+    @PostMapping("/register")
     public ResponseEntity<Object> saveAdmin(@Valid @RequestBody Admin admin){
         log.info("service=AdminController; method=saveAdmin(); message=saving admin");
         ResponseEntity<Object> response;

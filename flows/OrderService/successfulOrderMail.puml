@@ -1,0 +1,11 @@
+@startuml
+title <U> Successful order email
+
+control "UserService" as Service
+entity JavaMailSender as Mail
+
+Service -> Mail : successfulOrderMail(order, user)
+Mail -> Mail : send(message)
+
+
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+title <U> Remove from cart
+
+actor User
+control "UserController" as Controller
+control "UserService" as Service
+entity UserRepository as Dao
+database MongoDB as DB
+
+User -> Controller : /removeFromCart
+Controller -> Service : removeFromCart(cartDTO)
+Service -> Dao : removeFromCart(cartDTO)
+Dao -> DB : save(cartDTO)
+DB --> Dao
+Dao --> Service
+Service --> Controller
+Controller --> User : (200 OK) "Item removed successfully"
+
+@enduml

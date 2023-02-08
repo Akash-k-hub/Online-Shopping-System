@@ -1,0 +1,19 @@
+@startuml
+title <U> Get all items
+
+actor Admin
+control "AdminController" as Controller
+control "AdminService" as Service
+entity AdminRepository as Dao
+database MongoDB as DB
+
+Admin -> Controller : /getAllItems
+Controller -> Service : getAllItems()
+Service -> Dao : getAllItems()
+Dao -> DB: findAll()
+DB --> Dao : List<Item>
+Dao --> Service
+Service --> Controller
+Controller --> Admin : (200 OK) List<Item>
+
+@enduml

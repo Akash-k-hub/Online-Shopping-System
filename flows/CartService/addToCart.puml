@@ -1,0 +1,20 @@
+@startuml
+title <U> Add item to cart
+
+actor User
+control "UserController" as Controller
+control "UserService" as Service
+entity UserRepository as Dao
+database MongoDB as DB
+
+User -> Controller : /addToCart
+Controller -> Service : addToCart(cartDTO)
+Service -> Dao : addToCart(cartDTO)
+Dao -> DB : save(cartDTO)
+DB --> Dao
+Dao --> Service
+Service --> Controller
+Controller --> User : (200 OK) cart
+
+
+@enduml

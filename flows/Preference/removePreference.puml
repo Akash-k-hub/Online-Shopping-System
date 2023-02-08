@@ -1,0 +1,20 @@
+@startuml
+title <U> Removing preference
+
+actor User
+control "UserController" as Controller
+control "UserService" as Service
+entity UserRepository as Dao
+database MongoDB as DB
+
+User -> Controller : /removePreference
+Controller -> Service : removePreference(preferenceDTO)
+Service -> Dao : removePreference(preferenceDTO)
+Dao -> DB : save(preferenceDTO)
+DB --> Dao
+Dao --> Service
+Service --> Controller
+Controller --> User : (200 OK) "Preference got removed"
+
+
+@enduml

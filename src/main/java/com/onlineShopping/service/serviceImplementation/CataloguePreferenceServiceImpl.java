@@ -32,7 +32,7 @@ public class CataloguePreferenceServiceImpl implements CataloguePreferenceServic
             CataloguePreference preference = cataloguePreferenceRepository.findByEmail(preferenceDTO.getEmail());
             //check if user has already saved preference(s)
             if(preference!=null){
-                log.info("service=CataloguePreferenceServiceImpl; method=addPreference(); message=checking if user already has preference");
+                log.info("service=CataloguePreferenceServiceImpl; method=addPreference(); message=user already has preference, updating preferences");
                 List<String> preferenceList = preference.getPreferredCategory();
                 if(!preferenceList.contains(preferenceDTO.getPreferredCatalogue())){
                     preferenceList.add(preferenceDTO.getPreferredCatalogue());

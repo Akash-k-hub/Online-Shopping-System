@@ -1,0 +1,20 @@
+@startuml
+title <U> Registering the Admin
+
+actor Admin
+control "AdminController" as Controller
+control "AdminService" as Service
+entity AdminRepository as Dao
+database MongoDB as DB
+
+Admin -> Controller : /register
+Controller -> Service : registration(admin)
+Service -> Dao
+Dao -> DB : save(admin)
+DB --> DB
+DB --> Dao
+Dao --> Service
+Service --> Controller
+Controller --> Admin : (200 OK) "Admin registered successfully"
+
+@enduml

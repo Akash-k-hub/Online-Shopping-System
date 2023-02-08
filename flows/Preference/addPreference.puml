@@ -1,0 +1,20 @@
+@startuml
+title <U> Adding preference
+
+actor User
+control "UserController" as Controller
+control "UserService" as Service
+entity UserRepository as Dao
+database MongoDB as DB
+
+User -> Controller : /addPreference
+Controller -> Service : addPreference(preferenceDTO)
+Service -> Dao : addPreference(preferenceDTO)
+Dao -> DB : save(preferenceDTO)
+DB --> Dao
+Dao --> Service
+Service --> Controller
+Controller --> User : (200 OK) preference
+
+
+@enduml

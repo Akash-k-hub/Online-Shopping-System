@@ -55,6 +55,15 @@ public class ApplicationExceptionHandler {
         return new ResponseEntity<>(errorMap, HttpStatusCode.valueOf(404));
     }
 
+    @ExceptionHandler(CartNotFoundException.class)
+    public final ResponseEntity<Map<String, String>> handleCartNotFoundException(CartNotFoundException exception){
+        Map<String, String> errorMap = new HashMap<>();
+        String message = exception.getMessage();
+        errorMap.put("message", message);
+        log.warn("service=ApplicationExceptionHandler; method=handleCartNotFoundException; message=CART NOT FOUND!");
+        return new ResponseEntity<>(errorMap, HttpStatusCode.valueOf(404));
+    }
+
     @ExceptionHandler(ItemNotAvailableException.class)
     public final ResponseEntity<Map<String, String>> handleItemNotAvailableException(ItemNotAvailableException exception){
         Map<String, String> errorMap = new HashMap<>();

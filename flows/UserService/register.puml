@@ -1,0 +1,19 @@
+@startuml
+title <U> Registering the User
+
+actor User
+control "UserController" as Controller
+control "UserService" as Service
+entity UserRepository as Dao
+database MongoDB as DB
+
+User -> Controller : /register
+Controller -> Service : registration(user)
+Service -> Dao
+Dao -> DB : save(user)
+DB --> Dao
+Dao --> Service
+Service --> Controller
+Controller --> User : (200 OK) "User registered successfully"
+
+@enduml

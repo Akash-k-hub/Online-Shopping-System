@@ -18,8 +18,6 @@ import java.util.List;
 public class CataloguePreference implements Serializable {
     @Id
     private String id;
-
     private String email;
-
     private List<String> preferredCategory;
 }

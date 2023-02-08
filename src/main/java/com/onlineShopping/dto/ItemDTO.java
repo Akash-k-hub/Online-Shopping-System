@@ -23,7 +23,6 @@ public class ItemDTO {
     @Min(1)
     @Max(50)
     private int quantity;
-    @NotNull
     private float price;
     @NotNull
     private Category category;
