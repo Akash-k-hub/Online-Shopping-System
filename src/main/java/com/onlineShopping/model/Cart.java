@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -18,6 +17,5 @@ public class Cart implements Serializable {
     @Id
     private String id;
     private String email;
-    private List<Item> itemsInCart;
-//    private Map<Integer, Integer> itemList;
+    private Map<Integer, Integer> itemList;
 }

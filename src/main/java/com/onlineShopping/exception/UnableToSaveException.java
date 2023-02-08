@@ -1,6 +1,6 @@
 package com.onlineShopping.exception;
 
-public class UnableToSaveException extends RuntimeException{
+public class UnableToSaveException extends RuntimeException {
     public UnableToSaveException() {
     }
 

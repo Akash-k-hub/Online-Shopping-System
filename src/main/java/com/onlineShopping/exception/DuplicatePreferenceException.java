@@ -1,6 +1,6 @@
 package com.onlineShopping.exception;
 
-public class DuplicatePreferenceException extends RuntimeException{
+public class DuplicatePreferenceException extends RuntimeException {
     public DuplicatePreferenceException() {
     }
 

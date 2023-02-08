@@ -11,7 +11,6 @@ Admin -> Controller : /register
 Controller -> Service : registration(admin)
 Service -> Dao
 Dao -> DB : save(admin)
-DB --> DB
 DB --> Dao
 Dao --> Service
 Service --> Controller

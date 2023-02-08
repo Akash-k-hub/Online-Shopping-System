@@ -16,9 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -60,23 +59,25 @@ public class CartServiceImpl implements CartService {
         if (userRepository.findByEmail(cartDTO.getEmail()) != null) {
             Cart cart = cartRepository.findByEmail(cartDTO.getEmail());
             log.info("service=CartServiceImpl; method=removeItemFromCart(); message=checking if cart is empty");
+            //check if there is a cart for user
             if (cart != null) {
-                List<Item> itemsInCart = cart.getItemsInCart();
-                ListIterator<Item> listIterator = itemsInCart.listIterator();
-                try {
-                    for (Item item : itemsInCart) {
-                        if (item.getItemId() == cartDTO.getItemInCart().getItemId()) {
-                            listIterator.remove();
-                        }
-                    }
-                    cart.setItemsInCart(itemsInCart);
-                    log.info("service=CartServiceImpl; method=removeItemFromCart(); message=updating the cart");
-                    cartRepository.save(cart);
-                    return true;
-                } catch (ItemNotFoundException exception) {
+                Map<Integer, Integer> itemsInCart = cart.getItemList();
+                int itemKey = cartDTO.getItemInCart().getItemId();
+                //check if item exists in the cart
+                if (itemsInCart.containsKey(itemKey)) {
+                    log.warn("service=CartServiceImpl; method=removeItemFromCart(); message=removing item from the cart");
+                    itemsInCart.remove(itemKey);
+                } else {
+                    log.warn("service=CartServiceImpl; method=removeItemFromCart(); message=ITEM NOT PRESENT IN THE CART");
                     throw new ItemNotFoundException("Item not found!");
+                }
+                cart.setItemList(itemsInCart);
+                try {
+                    cartRepository.save(cart);
+                    log.info("service=CartServiceImpl; method=removeItemFromCart(); message=saving the updated cart");
+                    return true;
                 } catch (Exception exception) {
-                    throw new UnableToSaveException("Cart did not get saved!");
+                    throw new UnableToSaveException("Updated cart did not get saved!");
                 }
             }
             throw new CartNotFoundException("Cart not found!");
@@ -85,24 +86,15 @@ public class CartServiceImpl implements CartService {
     }
 
     private Cart updateCart(Cart existingCart, CartDTO cartDTO) {
+        log.info("service=CartServiceImpl; method=createCart(); message=cart exists");
         //check if cart already have that item -> update the quantity
-        List<Item> existingItemList = existingCart.getItemsInCart();
-        ListIterator<Item> listIterator = existingItemList.listIterator();
-        while (listIterator.hasNext()) {
-            Item item = listIterator.next();
-            //updating item quantity in the cart
-            if (item.getItemId() == cartDTO.getItemInCart().getItemId()) {
-                log.info("service=CartServiceImpl; method=createCart(); message=updating item in the cart");
-                item.setQuantity(cartDTO.getItemInCart().getQuantity());
-            }
-        }
-        if (!existingItemList.contains(cartDTO)) {
-            Item addItem = new Item();
-            addItem.setItemId(cartDTO.getItemInCart().getItemId());
-            addItem.setQuantity(cartDTO.getItemInCart().getQuantity());
-            existingItemList.add(addItem);
-        }
-        existingCart.setItemsInCart(existingItemList);
+        Map<Integer, Integer> existingItemList = existingCart.getItemList();
+        int itemKey = cartDTO.getItemInCart().getItemId();
+        int itemValue = cartDTO.getItemInCart().getQuantity();
+        //adding/updating item in the cart
+        log.info("service=CartServiceImpl; method=createCart(); message=updating the cart");
+        existingItemList.put(itemKey, itemValue);
+        existingCart.setItemList(existingItemList);
         try {
             cartRepository.save(existingCart);
             return existingCart;
@@ -115,15 +107,23 @@ public class CartServiceImpl implements CartService {
         log.info("service=CartServiceImpl; method=createCart(); message=no cart exists, creating new cart");
         Cart cart = new Cart();
         cart.setEmail(user.getEmail());
-        List<Item> itemList = new ArrayList<>();
-        itemList.add(cartDTO.getItemInCart());
-        cart.setItemsInCart(itemList);
+        int itemKey = cartDTO.getItemInCart().getItemId();
+        int itemValue = cartDTO.getItemInCart().getQuantity();
+        Item item = itemRepository.findByItemId(itemKey);
+        if (item != null) {
+            Map<Integer, Integer> itemList = new HashMap<>();
+            itemList.put(itemKey, itemValue);
+            cart.setItemList(itemList);
+        } else {
+            log.warn("service=CartServiceImpl; method=createCart(); message=ITEM NOT FOUND");
+            throw new ItemNotFoundException("Item not found!");
+        }
         try {
             log.info("service=CartServiceImpl; method=createCart(); message=saving the cart");
             cartRepository.save(cart);
             return cart;
         } catch (Exception exception) {
-            log.warn("service=CartServiceImpl; method=createCart(); message=cart did not saved");
+            log.warn("service=CartServiceImpl; method=createCart(); message=CART DID NOT GET SAVED");
             throw new UnableToSaveException("Cart not saved!");
         }
     }

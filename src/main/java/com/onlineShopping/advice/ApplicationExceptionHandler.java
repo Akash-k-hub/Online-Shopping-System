@@ -18,27 +18,27 @@ import java.util.Map;
 public class ApplicationExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidArguments(MethodArgumentNotValidException exception){
+    public ResponseEntity<Map<String, String>> handleInvalidArguments(MethodArgumentNotValidException exception) {
         Map<String, String> errorMap = new HashMap<>();
-        exception.getBindingResult().getFieldErrors().forEach(error->{
+        exception.getBindingResult().getFieldErrors().forEach(error -> {
             errorMap.put(error.getField(), error.getDefaultMessage());
         });
         log.warn("service=ApplicationExceptionHandler; method=handleInvalidArguments; message=INVALID ARGUMENT(S) PASSED");
-        log.error("{}",errorMap);
+        log.error("{}", errorMap);
         return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<Map<String, String>> handleDuplicateKeyException(DuplicateKeyException exception){
+    public ResponseEntity<Map<String, String>> handleDuplicateKeyException(DuplicateKeyException exception) {
         Map<String, String> errorMap = new HashMap<>();
         errorMap.put("email", "Email already exists!");
         log.warn("service=ApplicationExceptionHandler; method=handleDuplicateKeyException; message=DUPLICATE EMAIL");
-        log.error("{}",errorMap);
+        log.error("{}", errorMap);
         return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(UserNotFoundException.class)
-    public final ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException exception){
+    public final ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String message = exception.getMessage();
         errorMap.put("message", message);
@@ -47,7 +47,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(AdminNotFoundException.class)
-    public final ResponseEntity<Map<String, String>> handleAdminNotFoundException(AdminNotFoundException exception){
+    public final ResponseEntity<Map<String, String>> handleAdminNotFoundException(AdminNotFoundException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String message = exception.getMessage();
         errorMap.put("message", message);
@@ -56,7 +56,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(CartNotFoundException.class)
-    public final ResponseEntity<Map<String, String>> handleCartNotFoundException(CartNotFoundException exception){
+    public final ResponseEntity<Map<String, String>> handleCartNotFoundException(CartNotFoundException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String message = exception.getMessage();
         errorMap.put("message", message);
@@ -65,7 +65,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(ItemNotAvailableException.class)
-    public final ResponseEntity<Map<String, String>> handleItemNotAvailableException(ItemNotAvailableException exception){
+    public final ResponseEntity<Map<String, String>> handleItemNotAvailableException(ItemNotAvailableException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String message = exception.getMessage();
         errorMap.put("message", message);
@@ -74,7 +74,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(ItemNotFoundException.class)
-    public final ResponseEntity<Map<String, String>> handleItemNotFoundException(ItemNotFoundException exception){
+    public final ResponseEntity<Map<String, String>> handleItemNotFoundException(ItemNotFoundException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String message = exception.getMessage();
         errorMap.put("message", message);
@@ -83,7 +83,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(ItemQuantityNotAvailableException.class)
-    public final ResponseEntity<Map<String, String>> handleItemQuantityNotAvailableException(ItemQuantityNotAvailableException exception){
+    public final ResponseEntity<Map<String, String>> handleItemQuantityNotAvailableException(ItemQuantityNotAvailableException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String message = exception.getMessage();
         errorMap.put("message", message);
@@ -92,7 +92,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(NoPreferenceToRemoveException.class)
-    public final ResponseEntity<Map<String, String>> handleNoPreferenceToRemoveException(NoPreferenceToRemoveException exception){
+    public final ResponseEntity<Map<String, String>> handleNoPreferenceToRemoveException(NoPreferenceToRemoveException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String message = exception.getMessage();
         errorMap.put("message", message);
@@ -101,7 +101,7 @@ public class ApplicationExceptionHandler {
     }
 
     @ExceptionHandler(DuplicatePreferenceException.class)
-    public final ResponseEntity<Map<String, String>> handleDuplicatePreferenceException(DuplicatePreferenceException exception){
+    public final ResponseEntity<Map<String, String>> handleDuplicatePreferenceException(DuplicatePreferenceException exception) {
         Map<String, String> errorMap = new HashMap<>();
         String message = exception.getMessage();
         errorMap.put("message", message);

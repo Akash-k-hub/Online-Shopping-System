@@ -1,6 +1,5 @@
 package com.onlineShopping.controller;
 
-import com.onlineShopping.dto.ItemDTO;
 import com.onlineShopping.model.Admin;
 import com.onlineShopping.model.Item;
 import com.onlineShopping.service.interfaceService.AdminService;
@@ -25,15 +24,15 @@ public class AdminController {
     private AdminService adminService;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> saveAdmin(@Valid @RequestBody Admin admin){
+    public ResponseEntity<Object> saveAdmin(@Valid @RequestBody Admin admin) {
         log.info("service=AdminController; method=saveAdmin(); message=saving admin");
         ResponseEntity<Object> response;
         Map<String, String> responseMap = new HashMap<>();
         Admin result = adminService.saveAdmin(admin);
-        if(result!=null){
-            responseMap.put("message", "Admin "+ result.getFirstName() +", registered Successfully!");
+        if (result != null) {
+            responseMap.put("message", "Admin " + result.getFirstName() + ", registered Successfully!");
             response = new ResponseEntity<>(responseMap, HttpStatus.CREATED);
-        }else{
+        } else {
             responseMap.put("message", "Admin not created!");
             response = new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
         }
@@ -41,15 +40,15 @@ public class AdminController {
     }
 
     @PostMapping("/saveItem")
-    public ResponseEntity<Object> saveItem(@Valid @RequestBody Item item){
+    public ResponseEntity<Object> saveItem(@Valid @RequestBody Item item) {
         ResponseEntity<Object> response;
         Item result = adminService.saveItem(item);
         Map<String, String> responseMap = new HashMap<>();
-        if(result!=null){
+        if (result != null) {
             log.info("service=AdminController; method=saveAdmin(); message=item - {}, got saved", item.getItemName());
             responseMap.put("message", "Item added successfully!");
             response = new ResponseEntity<>(responseMap, HttpStatus.CREATED);
-        }else {
+        } else {
             log.warn("service=AdminController; method=saveAdmin(); message=item - {}, did not get saved", item.getItemName());
             responseMap.put("message", "Item did not get added!");
             response = new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
@@ -58,16 +57,16 @@ public class AdminController {
     }
 
     @GetMapping("/getAllItems")
-    public ResponseEntity<Object> getAllItems(){
+    public ResponseEntity<Object> getAllItems() {
         log.info("service=AdminController; method=getAllItems(); message=retrieving all items");
         ResponseEntity<Object> response;
         List<Item> itemList;
         itemList = adminService.getAllItems();
         Map<String, String> responseMap = new HashMap<>();
-        if(itemList!=null){
+        if (itemList != null) {
             log.info("service=AdminController; method=getAllItems(); message={} record(s) retrieved", itemList.size());
             response = new ResponseEntity<>(itemList, HttpStatus.OK);
-        }else{
+        } else {
             responseMap.put("message", "Item not found!");
             response = new ResponseEntity<>(responseMap, HttpStatusCode.valueOf(404));
         }
@@ -75,16 +74,16 @@ public class AdminController {
     }
 
     @GetMapping("/getItems/{category}")
-    public ResponseEntity<Object> getItemsByCategory(@PathVariable("category") String category){
+    public ResponseEntity<Object> getItemsByCategory(@PathVariable("category") String category) {
         log.info("service=AdminController; method=getItemsByCategory(); message=retrieving items by category");
         ResponseEntity<Object> response;
         List<Item> itemList;
         itemList = adminService.getItemsByCategory(category);
         Map<String, String> responseMap = new HashMap<>();
-        if (itemList!=null){
+        if (itemList != null) {
             log.info("service=AdminController; method=getItemsByCategory(); message={} item(s) retrieved", itemList.size());
             response = new ResponseEntity<>(itemList, HttpStatus.OK);
-        }else{
+        } else {
             responseMap.put("message", "Item not found!");
             response = new ResponseEntity<>(responseMap, HttpStatusCode.valueOf(404));
         }

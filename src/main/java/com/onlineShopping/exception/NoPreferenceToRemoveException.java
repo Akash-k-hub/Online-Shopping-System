@@ -1,6 +1,6 @@
 package com.onlineShopping.exception;
 
-public class NoPreferenceToRemoveException extends RuntimeException{
+public class NoPreferenceToRemoveException extends RuntimeException {
     public NoPreferenceToRemoveException() {
     }
 

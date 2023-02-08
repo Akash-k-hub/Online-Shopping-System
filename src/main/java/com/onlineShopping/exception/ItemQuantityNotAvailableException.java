@@ -1,6 +1,6 @@
 package com.onlineShopping.exception;
 
-public class ItemQuantityNotAvailableException extends RuntimeException{
+public class ItemQuantityNotAvailableException extends RuntimeException {
     public ItemQuantityNotAvailableException() {
     }
 

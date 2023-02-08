@@ -11,7 +11,6 @@ Admin -> Controller : /getItems/{category}
 Controller -> Service : getItemsByCategory(category)
 Service -> Dao : getItemsByCategory(category)
 Dao -> DB: itemsByCategory(category)
-DB --> DB
 DB --> Dao : List<Item>
 Dao --> Service
 Service --> Controller

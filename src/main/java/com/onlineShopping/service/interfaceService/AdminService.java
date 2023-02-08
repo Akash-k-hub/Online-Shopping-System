@@ -1,6 +1,5 @@
 package com.onlineShopping.service.interfaceService;
 
-import com.onlineShopping.dto.ItemDTO;
 import com.onlineShopping.model.Admin;
 import com.onlineShopping.model.Item;
 

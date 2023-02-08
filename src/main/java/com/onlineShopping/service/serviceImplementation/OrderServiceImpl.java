@@ -37,13 +37,6 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-
-//    @Override
-//    @Autowired
-//    public void mailService(JavaMailSender javaMailSender) {
-//        this.javaMailSender = javaMailSender;
-//    }
-
     @Override
     public Order placeOrder(OrderDTO orderDTO) throws MessagingException, MailException {
         log.info("service=OrderServiceImpl; method=placeOrder(); message=placing orders");
@@ -94,21 +87,22 @@ public class OrderServiceImpl implements OrderService {
         return order;
     }
 
-    @Override
-    public void successfulOrderMail(Order order, User user) throws MessagingException, MailException {
+    private void successfulOrderMail(Order order, User user) throws MessagingException, MailException {
         log.info("service=OrderServiceImpl; method=successfulOrderMail(); message=preparing mail to send to user");
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
         helper.setTo(user.getEmail());
         helper.setSubject("ONLINE SHOPPING SYSTEM - Thank you for shopping with us!!!");
         helper.setText(
-                "Thank you " + user.getFirstName() + ", for shopping with us. Below are your shopping details :" +
+                "Thank you " + user.getFirstName() + ", for shopping with us." +
+                        "\nBelow are your shopping details :" +
                         "\nOrder-Id : " + order.getOrderId() +
                         "\nPlaced on : " + order.getOrderDateTime() +
                         "\nName : " + user.getFirstName() + " " + user.getLastName() +
                         "\nAddress : " + user.getAddress() +
                         "\nItems : " + order.getItems().stream().map(itemDTO -> itemDTO.getItemName()).collect(Collectors.toList()) +
                         "\nItem quantity : " + order.getItems().stream().map(itemDTO -> itemDTO.getQuantity()).collect(Collectors.toList()) +
+                        "\nPrice of each item : " + order.getItems().stream().map(itemDTO -> itemDTO.getPrice()).collect(Collectors.toList()) +
                         "\nTotal Amount : " + order.getTotalAmount()
         );
         log.info("service=OrderServiceImpl; method=successfulOrderMail(); message=mail sent");

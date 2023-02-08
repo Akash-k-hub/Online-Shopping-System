@@ -1,7 +1,5 @@
 package com.onlineShopping.service.serviceImplementation;
 
-import com.onlineShopping.dto.ItemDTO;
-import com.onlineShopping.exception.AdminNotFoundException;
 import com.onlineShopping.exception.UnableToSaveException;
 import com.onlineShopping.model.Admin;
 import com.onlineShopping.model.Item;
@@ -33,7 +31,7 @@ public class AdminServiceImpl implements AdminService {
         admin.setPassword(encodedPassword);
         try {
             return adminRepository.save(admin);
-        }catch (Exception exception){
+        } catch (Exception exception) {
             throw new UnableToSaveException("Admin not saved!");
         }
     }
@@ -44,7 +42,7 @@ public class AdminServiceImpl implements AdminService {
             log.info("service=AdminServiceImpl; method=saveItem(); message=adding item");
             itemRepository.save(item);
             return item;
-        }catch (Exception exception){
+        } catch (Exception exception) {
             throw new UnableToSaveException("Item not saved!");
         }
     }
@@ -59,7 +57,7 @@ public class AdminServiceImpl implements AdminService {
     public List<Item> getItemsByCategory(String category) {
         List<Item> itemList = new ArrayList<>();
         List<Item> savedItems = itemRepository.itemsByCategory(category);
-        for(Item item : savedItems){
+        for (Item item : savedItems) {
             Item displayItem = new Item();
             displayItem.setItemId(item.getItemId());
             displayItem.setItemName(item.getItemName());

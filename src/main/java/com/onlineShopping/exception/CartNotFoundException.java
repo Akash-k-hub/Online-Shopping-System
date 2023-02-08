@@ -1,6 +1,6 @@
 package com.onlineShopping.exception;
 
-public class CartNotFoundException extends RuntimeException{
+public class CartNotFoundException extends RuntimeException {
     public CartNotFoundException() {
     }
 

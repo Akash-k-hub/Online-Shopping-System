@@ -28,27 +28,27 @@ public class CataloguePreferenceServiceImpl implements CataloguePreferenceServic
     public CataloguePreference addPreference(PreferenceDTO preferenceDTO) {
         //check if user exists in database
         log.info("service=CataloguePreferenceServiceImpl; method=addPreference(); message=checking if user exists");
-        if(userRepository.findByEmail(preferenceDTO.getEmail())!=null){
+        if (userRepository.findByEmail(preferenceDTO.getEmail()) != null) {
             CataloguePreference preference = cataloguePreferenceRepository.findByEmail(preferenceDTO.getEmail());
             //check if user has already saved preference(s)
-            if(preference!=null){
+            if (preference != null) {
                 log.info("service=CataloguePreferenceServiceImpl; method=addPreference(); message=user already has preference, updating preferences");
                 List<String> preferenceList = preference.getPreferredCategory();
-                if(!preferenceList.contains(preferenceDTO.getPreferredCatalogue())){
+                if (!preferenceList.contains(preferenceDTO.getPreferredCatalogue())) {
                     preferenceList.add(preferenceDTO.getPreferredCatalogue());
                     preference.setPreferredCategory(preferenceList);
                     try {
                         log.info("service=CataloguePreferenceServiceImpl; method=addPreference(); message=updating the preference list");
                         cataloguePreferenceRepository.save(preference);
                         return preference;
-                    }catch (Exception exception){
+                    } catch (Exception exception) {
                         log.warn("service=CataloguePreferenceServiceImpl; method=addPreference(); message=PREFERENCE DID NOT GET SAVED");
                         throw new UnableToSaveException("Catalogue Preference did not get saved!");
                     }
-                }else {
+                } else {
                     throw new DuplicatePreferenceException("Preference already added!");
                 }
-            }else {
+            } else {
                 log.info("service=CataloguePreferenceServiceImpl; method=addPreference(); message=creating the preference list");
                 CataloguePreference cataloguePreference = new CataloguePreference();
                 List<String> preferenceList = new ArrayList<>();
@@ -56,11 +56,11 @@ public class CataloguePreferenceServiceImpl implements CataloguePreferenceServic
                 cataloguePreference.setEmail(preferenceDTO.getEmail());
                 preferenceList.add(preferenceDTO.getPreferredCatalogue());
                 cataloguePreference.setPreferredCategory(preferenceList);
-                try{
+                try {
                     log.info("service=CataloguePreferenceServiceImpl; method=addPreference(); message=creating preference for user");
                     cataloguePreferenceRepository.save(cataloguePreference);
                     return cataloguePreference;
-                }catch (Exception exception){
+                } catch (Exception exception) {
                     log.warn("service=CataloguePreferenceServiceImpl; method=addPreference(); message=PREFERENCE DID NOT GET SAVED");
                     throw new UnableToSaveException("Catalogue Preference did not get saved!");
                 }
@@ -73,19 +73,19 @@ public class CataloguePreferenceServiceImpl implements CataloguePreferenceServic
     @Override
     public boolean removePreference(PreferenceDTO preferenceDTO) {
         //check if the user is registered,
-        if (userRepository.findByEmail(preferenceDTO.getEmail())!=null){
+        if (userRepository.findByEmail(preferenceDTO.getEmail()) != null) {
             String preferenceToRemove = preferenceDTO.getPreferredCatalogue();
             CataloguePreference preference = cataloguePreferenceRepository.findByEmail(preferenceDTO.getEmail());
             //check if the preference list is empty or not
-            if (!preference.getPreferredCategory().isEmpty()){
+            if (!preference.getPreferredCategory().isEmpty()) {
                 log.warn("service=CataloguePreferenceServiceImpl; method=removePreference(); message=removing {} from list", preferenceDTO.getPreferredCatalogue());
                 preference.getPreferredCategory().remove(preferenceDTO.getPreferredCatalogue());
                 try {
                     log.info("service=CataloguePreferenceServiceImpl; method=removePreference(); message=updating the preference list");
                     cataloguePreferenceRepository.save(preference);
                     return true;
-                }catch (Exception exception){
-                 throw new UnableToSaveException("Catalogue Preference did not get saved!");
+                } catch (Exception exception) {
+                    throw new UnableToSaveException("Catalogue Preference did not get saved!");
                 }
             }
             throw new NoPreferenceToRemoveException("Catalogue preference is already empty!");
