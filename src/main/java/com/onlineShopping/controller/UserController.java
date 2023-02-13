@@ -4,10 +4,7 @@ import com.onlineShopping.dto.CartDTO;
 import com.onlineShopping.dto.OrderDTO;
 import com.onlineShopping.dto.PreferenceDTO;
 import com.onlineShopping.exception.ItemNotAvailableException;
-import com.onlineShopping.model.Cart;
-import com.onlineShopping.model.CataloguePreference;
-import com.onlineShopping.model.Order;
-import com.onlineShopping.model.User;
+import com.onlineShopping.model.*;
 import com.onlineShopping.service.interfaceService.CartService;
 import com.onlineShopping.service.interfaceService.CataloguePreferenceService;
 import com.onlineShopping.service.interfaceService.OrderService;
@@ -17,13 +14,12 @@ import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -39,6 +35,7 @@ public class UserController {
     @Autowired
     private CartService cartService;
 
+    //endpoint for registering the user
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@Valid @RequestBody User user) {
         log.info("service=UserController; method=registerUser(); message=userController is accessed");
@@ -56,6 +53,7 @@ public class UserController {
         return response;
     }
 
+    //endpoint for validating user credentials
     @PostMapping("/login")
     public ResponseEntity<Object> userLogin(@RequestBody User user) {
         log.info("service=UserController; method=userLogin(); message=userController is accessed");
@@ -74,6 +72,7 @@ public class UserController {
         return response;
     }
 
+    //endpoint for placing an order
     @PostMapping("/placeOrder")
     public ResponseEntity<Object> placeOrder(@RequestBody OrderDTO orderDTO) throws ItemNotAvailableException, MessagingException {
         log.info("service=UserController; method=userLogin(); message=userController is accessed");
@@ -89,6 +88,7 @@ public class UserController {
         return response;
     }
 
+    //endpoint for adding a preference
     @PostMapping("/addPreference")
     public ResponseEntity<Object> addPreference(@RequestBody PreferenceDTO preferenceDTO) {
         ResponseEntity<Object> response;
@@ -103,6 +103,7 @@ public class UserController {
         return response;
     }
 
+    //endpoint for removing a preference
     @PostMapping("/removePreference")
     public ResponseEntity<Object> removePreference(@RequestBody PreferenceDTO preferenceDTO) {
         ResponseEntity<Object> response;
@@ -118,10 +119,11 @@ public class UserController {
         return response;
     }
 
+    //endpoint for adding an item in cart
     @PostMapping("/addToCart")
     public ResponseEntity<Object> addToCart(@RequestBody CartDTO cartDTO) {
         ResponseEntity<Object> response;
-        Cart cart = cartService.addToCart(cartDTO);
+        Cart cart = cartService.addItemToCart(cartDTO);
         if (cart != null) {
             response = new ResponseEntity<>(cart, HttpStatus.OK);
         } else {
@@ -132,6 +134,7 @@ public class UserController {
         return response;
     }
 
+    //endpoint for removing an item from cart
     @PostMapping("/removeFromCart")
     public ResponseEntity<Object> removeFromCart(@RequestBody CartDTO cartDTO) {
         ResponseEntity<Object> response;
@@ -143,6 +146,55 @@ public class UserController {
         } else {
             responseMap.put("message", "Item did not get removed");
             response = new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+        }
+        return response;
+    }
+
+    @GetMapping("/getCart/{email}")
+    public ResponseEntity<Object> getCartByEmail(@PathVariable String email){
+        ResponseEntity<Object> response;
+        Map<String, String> responseMap = new HashMap<>();
+        Cart cart = cartService.getCartByEmail(email);
+        if(cart!=null){
+            response = new ResponseEntity<>(cart, HttpStatus.OK);
+        } else {
+            log.error("service=UserController; method=getCartByEmail(); message=CART NOT FOUND");
+            responseMap.put("message", "Cart not found!");
+            response = new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+        }
+        return response;
+    }
+
+    @GetMapping("/getAllItems")
+    public ResponseEntity<Object> getAllItems(@RequestParam int pageNo, @RequestParam int pageSize){
+        ResponseEntity<Object> response;
+        List<Item> itemList;
+        itemList = userService.getAllItems(pageNo, pageSize);
+        Map<String, String> responseMap = new HashMap<>();
+        if (itemList != null) {
+            log.info("service=UserController; method=getAllItems(); message={} record(s) retrieved", itemList.size());
+            response = new ResponseEntity<>(itemList, HttpStatus.OK);
+        } else {
+            log.error("service=UserController; method=getAllItems(); message=ITEMS NOT RETRIEVED");
+            responseMap.put("message", "Item not found!");
+            response = new ResponseEntity<>(responseMap, HttpStatusCode.valueOf(404));
+        }
+        return response;
+    }
+
+    @GetMapping("/getItems/{category}")
+    public ResponseEntity<Object> getItemsByCategory(@PathVariable("category") String category) {
+        ResponseEntity<Object> response;
+        List<Item> itemList;
+        itemList = userService.getItemsByCategory(category);
+        Map<String, String> responseMap = new HashMap<>();
+        if (itemList != null) {
+            log.info("service=UserController; method=getItemsByCategory(); message={} item(s) retrieved", itemList.size());
+            response = new ResponseEntity<>(itemList, HttpStatus.OK);
+        } else {
+            log.error("service=UserController; method=getItemsByCategory(); message=ITEM NOT FOUND");
+            responseMap.put("message", "Item not found!");
+            response = new ResponseEntity<>(responseMap, HttpStatusCode.valueOf(404));
         }
         return response;
     }

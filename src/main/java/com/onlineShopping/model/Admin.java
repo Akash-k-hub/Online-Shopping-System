@@ -26,9 +26,6 @@ public class Admin implements Serializable {
     @NotEmpty(message = "Please enter last name.")
     @NotNull
     private String lastName;
-    @NotEmpty(message = "Please enter your phone number.")
-    @Size(min = 10, max = 10, message = "Please give the appropriate mobile number")
-    private String mobileNo;
     @Email(message = "Please give a valid email")
     @NotEmpty(message = "Please give an email")
     @NotNull

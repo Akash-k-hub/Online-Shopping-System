@@ -31,6 +31,7 @@ public class User implements Serializable {
     @NotEmpty
     private String gender;
     @NotEmpty(message = "Please give the contact number")
+    @Pattern(regexp = "^[0-9]{10}$", message = "Please enter the number only")
     @Size(min = 10, max = 10, message = "Please give the appropriate mobile number")
     private String mobileNo;
     @Email

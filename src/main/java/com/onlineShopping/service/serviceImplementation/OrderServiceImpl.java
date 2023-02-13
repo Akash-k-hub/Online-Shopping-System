@@ -18,6 +18,7 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,11 +38,14 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    //code for placing an order
+    @Transactional
     @Override
     public Order placeOrder(OrderDTO orderDTO) throws MessagingException, MailException {
         log.info("service=OrderServiceImpl; method=placeOrder(); message=placing orders");
         User user = userRepository.findByEmail(orderDTO.getEmail());
         if (Objects.isNull(user)) {
+            log.error("service=OrderServiceImpl; method=placeOrder(); message=USER NOT FOUND");
             throw new UserNotFoundException("User not found, please register and try again!");
         }
         List<Item> items = orderDTO.getItemsToOrder();
@@ -51,11 +55,13 @@ public class OrderServiceImpl implements OrderService {
         for (Item item : items) {
             Item fetchedItem = itemRepository.findByItemId(item.getItemId());
             if (fetchedItem == null) {
+                log.error("service=OrderServiceImpl; method=placeOrder(); message=ITEM NOT FOUND");
                 throw new ItemNotFoundException("Item not found!");
             }
             int currQuantity = fetchedItem.getQuantity();
             //checking if the item is in stock
             if (currQuantity <= 0) {
+                log.error("service=OrderServiceImpl; method=placeOrder(); message=ITEM NOT AVAILABLE");
                 throw new ItemNotAvailableException("Item not available!");
             }
             //transforming itemDTO
@@ -65,29 +71,29 @@ public class OrderServiceImpl implements OrderService {
             //updating item quantity in itemRepository
             try {
                 itemRepository.save(fetchedItem);
-
                 totalAmount += item.getQuantity() * fetchedItem.getPrice();
                 orderItems.add(itemDTO);
             } catch (Exception exception) {
+                log.error("service=OrderServiceImpl; method=placeOrder(); message=ITEM QUANTITY NOT UPDATED");
                 throw new UnableToSaveException("Item quantity could not get updated!");
             }
         }
         //preparing the order
         Order order = prepareOrder(user, orderItems, totalAmount);
-
         try {
             orderRepository.save(order);
             log.info("service=OrderServiceImpl; method=placeOrder(); message=order placed with {} item(s)", orderItems.size());
         } catch (Exception exception) {
-            log.warn("ORDER NOT SAVED");
+            log.error("service=OrderServiceImpl; method=placeOrder(); message=ORDER NOT SAVED");
             throw new UnableToSaveException("Order did not saved!");
         }
         //send a mail to the user
-        successfulOrderMail(order, user);
+        orderPlacedMail(order, user);
         return order;
     }
 
-    private void successfulOrderMail(Order order, User user) throws MessagingException, MailException {
+    //code for sending a 'Thank you' mail to the user
+    private void orderPlacedMail(Order order, User user) throws MessagingException, MailException {
         log.info("service=OrderServiceImpl; method=successfulOrderMail(); message=preparing mail to send to user");
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
@@ -109,12 +115,13 @@ public class OrderServiceImpl implements OrderService {
         javaMailSender.send(mimeMessage);
     }
 
+    //code for preparing an item
     private ItemDTO prepareItemDTO(Item item, Item fetchedItem) {
-        var itemDTO = new ItemDTO();
+        ItemDTO itemDTO = new ItemDTO();
         log.info("service=OrderServiceImpl; method=prepareItemDTO(); message=transforming itemDTO");
         //adding details of the item retrieved in itemDTO
         if (fetchedItem.getQuantity() < item.getQuantity()) {
-            log.warn("service=OrderServiceImpl; method=prepareItemDTO(); message=only {} unit(s) available", fetchedItem.getQuantity());
+            log.error("service=OrderServiceImpl; method=prepareItemDTO(); message=only {} unit(s) available", fetchedItem.getQuantity());
             throw new ItemQuantityNotAvailableException(fetchedItem.getItemName() + " available quantity is only " + fetchedItem.getQuantity());
         }
         itemDTO.setItemId(fetchedItem.getItemId());
@@ -126,6 +133,7 @@ public class OrderServiceImpl implements OrderService {
         return itemDTO;
     }
 
+    //code for preparing an order
     private Order prepareOrder(User user, List<ItemDTO> orderItems, float totalAmount) {
         Order order = new Order();
         order.setName(user.getFirstName() + " " + user.getLastName());

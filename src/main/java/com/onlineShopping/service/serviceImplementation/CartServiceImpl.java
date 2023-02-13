@@ -1,6 +1,7 @@
 package com.onlineShopping.service.serviceImplementation;
 
 import com.onlineShopping.dto.CartDTO;
+import com.onlineShopping.dto.ItemDTO;
 import com.onlineShopping.exception.CartNotFoundException;
 import com.onlineShopping.exception.ItemNotFoundException;
 import com.onlineShopping.exception.UnableToSaveException;
@@ -15,8 +16,11 @@ import com.onlineShopping.service.interfaceService.CartService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -30,8 +34,10 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private ItemRepository itemRepository;
 
+    //code for adding an item to the cart
+    @Transactional
     @Override
-    public Cart addToCart(CartDTO cartDTO) {
+    public Cart addItemToCart(CartDTO cartDTO) {
         log.info("service=CartServiceImpl; method=addToCart(); message=checking if user is registered");
         //check if user is registered or not
         User user = userRepository.findByEmail(cartDTO.getEmail());
@@ -40,18 +46,21 @@ public class CartServiceImpl implements CartService {
             //check if user already has a cart
             log.info("service=CartServiceImpl; method=addToCart(); message=checking if user already has a cart");
             if (existingCart != null) {
-                //update the cart
+                //cart exists, updating the cart
                 Cart cart = updateCart(existingCart, cartDTO);
                 return cart;
             } else {
-                //create a cart
+                //cart not exist, creating a new cart
                 Cart cart = createCart(cartDTO, user);
                 return cart;
             }
         }
+        log.error("service=CartServiceImpl; method=addToCart(); message=UN-REGISTERED USER");
         throw new UserNotFoundException("User not registered, please register and try again!");
     }
 
+    //code for removing an item from cart
+    @Transactional
     @Override
     public boolean removeItemFromCart(CartDTO cartDTO) {
         log.info("service=CartServiceImpl; method=removeItemFromCart(); message=checking if user is registered");
@@ -65,10 +74,10 @@ public class CartServiceImpl implements CartService {
                 int itemKey = cartDTO.getItemInCart().getItemId();
                 //check if item exists in the cart
                 if (itemsInCart.containsKey(itemKey)) {
-                    log.warn("service=CartServiceImpl; method=removeItemFromCart(); message=removing item from the cart");
+                    log.info("service=CartServiceImpl; method=removeItemFromCart(); message=removing item from the cart");
                     itemsInCart.remove(itemKey);
                 } else {
-                    log.warn("service=CartServiceImpl; method=removeItemFromCart(); message=ITEM NOT PRESENT IN THE CART");
+                    log.error("service=CartServiceImpl; method=removeItemFromCart(); message=ITEM NOT PRESENT IN THE CART");
                     throw new ItemNotFoundException("Item not found!");
                 }
                 cart.setItemList(itemsInCart);
@@ -77,14 +86,29 @@ public class CartServiceImpl implements CartService {
                     log.info("service=CartServiceImpl; method=removeItemFromCart(); message=saving the updated cart");
                     return true;
                 } catch (Exception exception) {
+                    log.error("service=CartServiceImpl; method=removeItemFromCart(); message=CART NOT SAVED");
                     throw new UnableToSaveException("Updated cart did not get saved!");
                 }
             }
+            log.error("service=CartServiceImpl; method=removeItemFromCart(); message=CART NOT FOUND");
             throw new CartNotFoundException("Cart not found!");
         }
+        log.error("service=CartServiceImpl; method=removeItemFromCart(); message=UN-REGISTERED USER");
         throw new UserNotFoundException("User not registered, please register and try again!");
     }
 
+    @Override
+    public Cart getCartByEmail(String email) {
+        Cart cart = cartRepository.findByEmail(email);
+        if (cart!=null){
+            return cart;
+        }else {
+            log.error("service=CartServiceImpl; method=getCartByEmail(); message=CART NOT FOUND");
+            throw new CartNotFoundException("Cart not found");
+        }
+    }
+
+    //code to update the existing cart of the user
     private Cart updateCart(Cart existingCart, CartDTO cartDTO) {
         log.info("service=CartServiceImpl; method=createCart(); message=cart exists");
         //check if cart already have that item -> update the quantity
@@ -99,10 +123,12 @@ public class CartServiceImpl implements CartService {
             cartRepository.save(existingCart);
             return existingCart;
         } catch (Exception exception) {
+            log.error("service=CartServiceImpl; method=createCart(); message=CART NOT UPDATED");
             throw new UnableToSaveException("Cart did not get updated!");
         }
     }
 
+    //code to create a new cart for the user
     private Cart createCart(CartDTO cartDTO, User user) {
         log.info("service=CartServiceImpl; method=createCart(); message=no cart exists, creating new cart");
         Cart cart = new Cart();
@@ -115,7 +141,7 @@ public class CartServiceImpl implements CartService {
             itemList.put(itemKey, itemValue);
             cart.setItemList(itemList);
         } else {
-            log.warn("service=CartServiceImpl; method=createCart(); message=ITEM NOT FOUND");
+            log.error("service=CartServiceImpl; method=createCart(); message=ITEM NOT FOUND");
             throw new ItemNotFoundException("Item not found!");
         }
         try {
@@ -123,7 +149,7 @@ public class CartServiceImpl implements CartService {
             cartRepository.save(cart);
             return cart;
         } catch (Exception exception) {
-            log.warn("service=CartServiceImpl; method=createCart(); message=CART DID NOT GET SAVED");
+            log.error("service=CartServiceImpl; method=createCart(); message=CART DID NOT GET SAVED");
             throw new UnableToSaveException("Cart not saved!");
         }
     }
